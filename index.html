@@ -2,369 +2,155 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=550px, width-scale=550px"/>
+  <meta name="viewport" content="width=550px, initial-scale=1.0"/>
   <title>TOPUPSKUY - APP PREMIUM, TOPUP GAME, EWALLET, AND MORE!!</title>
+
+  <!-- SEO & Social -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://topupskuy.github.io/payment" />
   <meta property="og:title" content="TOPUPSKUY - App Premium, Topup Game, eWallet, dan Lainnya!" />
   <meta property="og:description" content="Topup cepat & murah untuk game, eWallet, hingga layanan app premium. Mudah, aman, 24/7." />
   <meta property="og:image" content="https://hisoka.net/file/IMG_20250826_083458-1761413991.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="TOPUPSKUY - App Premium, Topup Game, eWallet, dan Lainnya!" />
-  <meta name="twitter:description" content="Topup cepat & murah untuk game, eWallet, hingga layanan app premium. Mudah, aman, 24/7." />
-  <meta name="twitter:image" content="https://hisoka.net/file/IMG_20250826_083458-1761413991.png" />
+
   <style>
-    /* ====== BASE LAYOUT (asli) ====== */
-    body, html {
-      margin: 0; height: 100%;
+    html, body {
+      margin: 0;
+      height: 100%;
       background: #0b0b0b;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       overflow: hidden;
     }
-    #overlay {
-      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(255, 255, 255, 0.9);
-      z-index: 99999; cursor: pointer; text-align: center; padding: 24px; line-height: 1.4;
-      transition: opacity .35s ease, transform .28s ease;
-    }
-    #overlay .inner { max-width: 560px; color: #111; font-size: 20px; }
-    #overlay .hint { margin-top: 10px; font-size: 14px; color: #555; }
-
-    #pileCanvas, #fxCanvas {
-      position: fixed; inset: 0; pointer-events: none; display: none;
-    }
-    #pileCanvas { z-index: 1001; }
-    #fxCanvas   { z-index: 1002; }
 
     #mainWrap {
-      position: fixed; inset: 0; width: 99%; height: 99%;
-      left: 50%; top: 50%; transform: translate(-50%, -50%);
-      border: none; display: none; z-index: 1; background: #000; box-sizing: border-box;
-      display: flex; flex-direction: column; gap: 2px;
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 1;
     }
-    #mainFrameBottom, #mainFrameTop { flex: 1; width: 100%; border: none; background: #fff; }
+
+    #mainFrameTop,
+    #mainFrameBottom {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
 
     #popupWrap {
-      position: fixed; width: 99%; height: 99%; left: 50%; top: 50%;
-      transform: translate(-50%, -50%); display: block; z-index: 1000;
-      background: rgba(255, 255, 255, 0.9); box-sizing: border-box; padding: 0.5px 0 0 0.5px;
-    }
-    #popupFrame { width: 100%; height: 100%; border: none; background: #aaa; }
-    #closePopup {
-      position: absolute; top: 10px; right: 10px; z-index: 1001;
-      background: rgba(0, 0, 0, 0.6); color: #fff; border: 0; padding: 10px 12px; border-radius: 10px; cursor: pointer; backdrop-filter: blur(2px);
-    }
-    #closePopup:hover { background: rgba(0, 0, 0, 0.8); }
-
-    /* ====== Overlay vanish/reappear ====== */
-    .vanish { opacity: 0 !important; transform: scale(.96) !important; pointer-events: none !important; }
-    .reappear { animation: reappear .28s cubic-bezier(.2,.9,.2,1); }
-    @keyframes reappear { from { opacity: 0; transform: scale(.96) } to { opacity: 1; transform: scale(1) } }
-
-    /* ====== Particles & Shockwave (di atas overlay) ====== */
-    .shockwave {
-      position: fixed; pointer-events: none; z-index: 100000;
-      width: 12px; height: 12px; left: 0; top: 0; border-radius: 999px;
-      border: 2px solid rgba(0,0,0,.8); opacity: .95;
-      transform: translate(-50%,-50%) scale(1);
-      animation: wave 1000ms cubic-bezier(.2,.85,.25,1) forwards;
-      filter: drop-shadow(0 0 14px rgba(0,0,0,.25));
-    }
-    @keyframes wave {
-      0%   { transform: translate(-50%,-50%) scale(1); opacity: .95 }
-      80%  { opacity: .35 }
-      100% { transform: translate(-50%,-50%) scale(18); opacity: 0 }
-    }
-    .particle {
-      position: fixed; z-index: 100000; pointer-events: none;
-      width: 6px; height: 6px; border-radius: 50%;
-      transform: translate(-50%,-50%) translate(0,0) scale(1); opacity: 1;
-      animation: burst var(--dur, 1600ms) cubic-bezier(.2,.9,.2,1) forwards;
-      will-change: transform, opacity, filter;
-    }
-    .particle.square { border-radius: 2px }
-    .particle.bar { width: 12px; height: 3px; border-radius: 2px }
-    @keyframes burst {
-      0%   { transform: translate(-50%,-50%) translate(0,0) scale(1) rotate(0deg); opacity: 1; filter: blur(0) }
-      65%  { transform: translate(-50%,-50%) translate(var(--tx), var(--ty)) scale(.95) rotate(var(--rot)); opacity: .9 }
-      100% { transform: translate(-50%,-50%) translate(calc(var(--tx)*1.15), calc(var(--ty)*1.15)) scale(.55) rotate(calc(var(--rot)*1.2)); opacity: 0; filter: blur(2px) }
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,.9);
+      padding: .5px;
     }
 
-    /* ====== Tombol pelangi di dalam overlay (opsional) ====== */
-    .glow-on-hover {
-      --radius: 12px;
-      width: 240px; height: 56px; border: 0; outline: 0; cursor: pointer;
-      border-radius: var(--radius); color: #111; background: #fff; font-weight: 700;
-      letter-spacing: .12em; text-transform: uppercase; font-size: 14px;
-      position: relative; z-index: 0; transition: transform .16s ease, filter .16s ease, opacity .28s ease;
+    #popupFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #aaa;
     }
-    .glow-on-hover:after { content:""; position:absolute; inset:0; border-radius:inherit; background:#fff; z-index:-1 }
-    .glow-on-hover:before{
-      content:""; position:absolute; inset:-2px; border-radius:inherit; z-index:-2;
-      background: linear-gradient(45deg,#ff0000,#ff7300,#fffb00,#48ff00,#00ffd5,#002bff,#7a00ff,#ff00c8,#ff0000);
-      background-size: 400% 100%; filter: blur(8px); opacity: .55; animation: rainbow 18s linear infinite;
-    }
-    .glow-on-hover:hover { filter: brightness(1.06) }
-    @keyframes rainbow { 0%{background-position:0% 50%} 100%{background-position:400% 50%} }
 
-    @media (prefers-reduced-motion: reduce){
-      .shockwave, .particle { display: none !important }
-      .glow-on-hover:before { animation: none }
+    #pileCanvas,
+    #fxCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2000;
     }
   </style>
 </head>
-<body id="openStoreBtn">
 
-  <!-- ====== OVERLAY (klik di mana saja) ====== -->
-  <div id="overlay">
-    <div class="inner">
-      <strong>Haii >.&lt;, selamat datang!</strong><br/>Senang bisa bertemu denganmu lagi 😊.
-      Klik dimanapun untuk membuka store.
-      <div class="hint">
-        Harap gunakan chrome untuk pengalaman terbaik.<br/>
-        <a style="font-size:12px;color:red;opacity:.6">Jika tiba-tiba ke halaman lain, klik kembali segera!</a>
-      </div>
-      <!-- Tombol opsional, ikut hilang & efek saat diklik -->
-      <div style="margin-top:18px">
-        <button class="glow-on-hover" type="button" id="enterBtn">Buka Store</button>
-      </div>
-    </div>
-  </div>
+<body id="clickAd">
 
-  <!-- Kanvas efek salju (asli) -->
+  <!-- CANVAS FX -->
   <canvas id="pileCanvas"></canvas>
   <canvas id="fxCanvas"></canvas>
 
-  <!-- Main & popup (asli) -->
+  <!-- MAIN IFRAMES -->
   <div id="mainWrap">
-    <iframe id="mainFrameTop" src=""></iframe>
-    <iframe id="mainFrameBottom" src=""></iframe>
+    <iframe id="mainFrameTop"></iframe>
+    <iframe id="mainFrameBottom"></iframe>
   </div>
+
+  <!-- POPUP PAYMENT -->
   <div id="popupWrap">
-    <iframe id="popupFrame" src=""></iframe>
+    <iframe id="popupFrame" src="https://tskuy.github.io/payar/"></iframe>
   </div>
 
-  <script>
-    /* ========= KONFIG & UTIL EFEK ========= */
-    const COLORS = ['#ff0000','#ff7300','#fffb00','#48ff00','#00ffd5','#002bff','#7a00ff','#ff00c8'];
-    const rnd = (min, max) => Math.random() * (max - min) + min;
-    const pick = arr => arr[Math.floor(rnd(0, arr.length))];
+<script>
+/* ================= CONFIG ================= */
+const mainUrls = [
+  "https://taxdifferenceinvestor.com/h2w9khx9?key=867a847d3e7de1f4a76f93ffa873cb1b",
+  "https://taxdifferenceinvestor.com/h2w9khx9?key=867a847d3e7de1f4a76f93ffa873cb1b"
+];
+const AD_URL = "https://topupskuy.github.io";
 
-    function spawnShockwave(x, y){
-      const w = document.createElement('span');
-      w.className = 'shockwave';
-      w.style.left = `${x}px`; w.style.top  = `${y}px`;
-      document.body.appendChild(w);
-      w.addEventListener('animationend', ()=> w.remove());
-    }
-    function spawnBurst(x, y, {count=48, dur=1600, min=90, max=190} = {}){
-      const frag = document.createDocumentFragment();
-      for (let i=0;i<count;i++){
-        const p = document.createElement('span');
-        const t = Math.random();
-        if (t < 0.25) p.className = 'particle bar';
-        else if (t < 0.55) p.className = 'particle square';
-        else p.className = 'particle';
-        p.style.left = `${x}px`; p.style.top  = `${y}px`;
+/* ================= MAIN LOGIC ================= */
+const topFrame = document.getElementById("mainFrameTop");
+const bottomFrame = document.getElementById("mainFrameBottom");
+let idx = 0;
 
-        const angle = rnd(0, Math.PI*2);
-        const dist  = rnd(min, max);
-        const tx = Math.cos(angle)*dist, ty = Math.sin(angle)*dist;
+function cycleMain() {
+  const a = mainUrls[idx % mainUrls.length];
+  const b = mainUrls[(idx + 1) % mainUrls.length];
+  topFrame.src = a + "&t=" + Date.now();
+  bottomFrame.src = b + "&t=" + Date.now();
+  idx++;
+}
 
-        p.style.setProperty('--tx', `${tx}px`);
-        p.style.setProperty('--ty', `${ty}px`);
-        p.style.setProperty('--rot', `${rnd(-260,260)}deg`);
-        p.style.setProperty('--dur', `${dur + rnd(-220,240)}ms`);
-        p.style.animationDelay = `${rnd(0, 150)}ms`;
+window.addEventListener("load", () => {
+  cycleMain();
+  setInterval(cycleMain, 60000);
+  startSnowFX();
+});
 
-        const c1 = pick(COLORS), c2 = pick(COLORS);
-        if (p.classList.contains('bar')) {
-          p.style.background = `linear-gradient(90deg, ${c1}, ${c2})`;
-        } else {
-          p.style.background = c1;
-          if (Math.random() < .28) p.style.boxShadow = `0 0 6px ${c1}`;
-        }
+/* ================= IKLAN (CLICK 1x) ================= */
+let adOpened = false;
+document.getElementById("clickAd").addEventListener("click", () => {
+  if (adOpened) return;
+  adOpened = true;
+  window.open(AD_URL, "_blank", "noopener");
+});
 
-        if (p.classList.contains('particle')) {
-          const s = rnd(4, 8); p.style.width = `${s}px`; p.style.height = `${s}px`;
-        } else if (p.classList.contains('square')) {
-          const s = rnd(5, 9); p.style.width = `${s}px`; p.style.height = `${s}px`;
-        } else if (p.classList.contains('bar')) {
-          p.style.width = `${rnd(10,18)}px`; p.style.height = `${rnd(2,4)}px`;
-        }
+/* ================= SNOW FX (ASLI, DIRAPIKAN) ================= */
+function startSnowFX() {
+  const fx = document.getElementById("fxCanvas");
+  const pile = document.getElementById("pileCanvas");
+  const ctxFx = fx.getContext("2d");
+  const ctxPile = pile.getContext("2d");
 
-        frag.appendChild(p);
-        p.addEventListener('animationend', ()=> p.remove());
-      }
-      document.body.appendChild(frag);
-    }
+  function resize() {
+    fx.width = pile.width = window.innerWidth;
+    fx.height = pile.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
 
-    /* ========= KODE ASLI KAMU (sedikit disesuaikan) ========= */
-    const mainUrls = ["https://taxdifferenceinvestor.com/h2w9khx9?key=867a847d3e7de1f4a76f93ffa873cb1b", "https://taxdifferenceinvestor.com/h2w9khx9?key=867a847d3e7de1f4a76f93ffa873cb1b"];
-    const overlay = document.getElementById("overlay");
-    const mainWrap = document.getElementById("mainWrap");
-    const mainFrameTop = document.getElementById("mainFrameTop");
-    const mainFrameBottom = document.getElementById('mainFrameBottom');
-    const popupWrap = document.getElementById("popupWrap");
-    const popupFrame = document.getElementById("popupFrame");
-    const fxCanvas = document.getElementById("fxCanvas");
-    const pileCanvas = document.getElementById("pileCanvas");
-    const enterBtn = document.getElementById("enterBtn");
-    const openStoreBtn = document.getElementById("openStoreBtn"); // body
+  const flakes = Array.from({length:120}, () => ({
+    x: Math.random()*innerWidth,
+    y: Math.random()*innerHeight,
+    r: Math.random()*2+1,
+    vy: Math.random()*0.5+0.2
+  }));
 
-    let started = false, idx = 0, ticker = null, rafFall = null, rafPile = null;
-
-    function startAll() {
-      if (started) return;
-      started = true;
-      overlay.style.display = 'none';          // disembunyikan setelah animasi
-      mainWrap.style.display = "flex";
-      popupWrap.style.display = 'block';
-      fxCanvas.style.display = 'block';
-      pileCanvas.style.display = "block";
-      cycleMain();
-      popupFrame.src = "https://tskuy.github.io/payar/";
-      ticker = setInterval(cycleMain, 60000);
-      startSnowFX();
-    }
-    function cycleMain() {
-      if (!mainUrls.length) return;
-      const a = mainUrls[idx % mainUrls.length];
-      const b = mainUrls[(idx + 1) % mainUrls.length];
-      mainFrameTop.src = a + (a.includes('?') ? '&' : '?') + 't=' + Date.now();
-      mainFrameBottom.src = b + (b.includes('?') ? '&' : '?') + 't=' + Date.now();
-      idx++;
-    }
-
-    // ===== Overlay & tombol: efek + hilang + lanjut startAll =====
-    const EFFECT = {count: 52, dur: 1700, min: 100, max: 210};
-    const COOLDOWN = EFFECT.dur + 260; // jeda sebelum startAll
-
-    function handleOverlayClick(e){
-      // Titik klik
-      const x = e.clientX, y = e.clientY;
-
-      // Efek visual
-      spawnShockwave(x, y);
-      spawnBurst(x, y, EFFECT);
-
-      // Hilangkan overlay + tombol jika ada
-      overlay.classList.add('vanish');
-      if (enterBtn) enterBtn.classList.add('vanish');
-
-      // Setelah efek selesai, jalankan startAll (hanya sekali)
-      setTimeout(() => startAll(), COOLDOWN);
-    }
-
-    // Klik pada overlay (di mana saja)
-    overlay.addEventListener("click", (e) => {
-      // Hindari double trigger jika target body handler ikut terpanggil
-      e.stopPropagation();
-      handleOverlayClick(e);
+  function tick() {
+    ctxFx.clearRect(0,0,fx.width,fx.height);
+    flakes.forEach(f => {
+      ctxFx.beginPath();
+      ctxFx.arc(f.x,f.y,f.r,0,Math.PI*2);
+      ctxFx.fillStyle="#fff";
+      ctxFx.fill();
+      f.y+=f.vy;
+      if(f.y>innerHeight){f.y=-5;f.x=Math.random()*innerWidth;}
     });
-
-    // Klik pada tombol (opsional), juga trigger efek di titik klik
-    if (enterBtn) {
-      enterBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleOverlayClick(e);
-        // Tambahan: buka redirect di tab baru sesuai perilaku sebelumnya
-      });
-    }
-
-    // Tetap dukung klik di body (fallback), tetapi jangan mengganggu overlay flow
-    openStoreBtn.addEventListener("click", (e) => {
-      if (started) return;
-      // Jika overlay masih aktif dan kliknya “tembus”, jalankan alur overlay juga
-      handleOverlayClick(e);
-      window.open("https://topupskuy.github.io", "_blank", 'noopener');
-    });
-
-    /* ========= Efek salju (asli) ========= */
-    function startSnowFX() {
-      const ctxFx = fxCanvas.getContext('2d');
-      const ctxPile = pileCanvas.getContext('2d');
-      const DPR = Math.max(1, Math.round(window.devicePixelRatio || 1));
-      function resize() {
-        const w = Math.floor(window.innerWidth * DPR);
-        const h = Math.floor(window.innerHeight * DPR);
-        fxCanvas.width = w; fxCanvas.height = h; ctxFx.setTransform(DPR,0,0,DPR,0,0);
-        pileCanvas.width = w; pileCanvas.height = h; ctxPile.setTransform(DPR,0,0,DPR,0,0);
-      }
-      window.addEventListener("resize", resize); resize();
-
-      const flakes = [];
-      for (let i=0;i<140;i++){
-        flakes.push({
-          x: Math.random() * window.innerWidth,
-          y: -10 - Math.random() * window.innerHeight,
-          r: 0.7 + Math.random() * 1.6,
-          vy: 0.18 + Math.random() * 0.45,
-          vx: -0.22 + Math.random() * 0.44,
-          drift: Math.random() * 0.02 + 0.006,
-          rot: Math.random() * Math.PI * 2,
-          shape: ['circle','square','triangle','cross'][Math.random()*4|0]
-        });
-      }
-      const pile = [];
-      function drawShape(ctx, x,y, r, shape, rot, glow=false, alpha=1){
-        ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x,y); ctx.rotate(rot||0);
-        ctx.shadowBlur = glow ? 6 : 0; ctx.shadowColor = glow ? 'rgba(255,255,255,0.6)' : 'transparent';
-        ctx.fillStyle = "#ffffff"; ctx.strokeStyle = '#ffffff';
-        switch (shape) {
-          case 'circle': ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill(); break;
-          case 'square': ctx.beginPath(); ctx.rect(-r,-r, 2*r,2*r); ctx.fill(); break;
-          case 'triangle':
-            ctx.beginPath(); const h = r*2.2;
-            ctx.moveTo(0, -h/2); ctx.lineTo(-r, h/2); ctx.lineTo(r, h/2); ctx.closePath(); ctx.fill(); break;
-          case 'cross':
-            ctx.lineWidth = Math.max(1, r*0.8);
-            ctx.beginPath(); ctx.moveTo(-r*1.2,0); ctx.lineTo(r*1.2,0); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(0,-r*1.2); ctx.lineTo(0,r*1.2); ctx.stroke(); break;
-        }
-        ctx.restore();
-      }
-      function drawPile() {
-        ctxPile.clearRect(0,0,pileCanvas.width,pileCanvas.height);
-        const now = performance.now();
-        for (let i=pile.length-1;i>=0;i--){
-          const it = pile[i], age = now - it.created;
-          if (age > 10000) { pile.splice(i,1); continue; }
-          const alpha = Math.max(0.15, 1 - age/10000);
-          drawShape(ctxPile, it.x, it.y, it.r, it.shape, it.rot, true, alpha);
-        }
-        requestAnimationFrame(drawPile);
-      }
-      function tick() {
-        ctxFx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
-        for (const f of flakes) {
-          drawShape(ctxFx, f.x, f.y, f.r, f.shape, f.rot, false, 0.95);
-          f.vx += Math.sin((f.y) * f.drift) * 0.0008;
-          f.x += f.vx; f.y += f.vy; f.rot += 0.01 * (f.vx >= 0 ? 1 : -1);
-          if (f.y >= window.innerHeight - f.r - 1) {
-            pile.push({ x: f.x, y: window.innerHeight - f.r - 1, r: f.r, shape: f.shape, rot: f.rot, created: performance.now() });
-            Object.assign(f, {
-              x: Math.random()*window.innerWidth, y: -10 - Math.random()*40,
-              r: 0.7 + Math.random()*1.6, vy: 0.18 + Math.random()*0.45, vx: -0.22 + Math.random()*0.44,
-              drift: Math.random()*0.02 + 0.006, rot: Math.random() * Math.PI * 2,
-              shape: ['circle','square','triangle','cross'][Math.random()*4|0]
-            });
-          }
-          if (f.x < -10) f.x = window.innerWidth + 10;
-          if (f.x > window.innerWidth + 10) f.x = -10;
-        }
-        requestAnimationFrame(tick);
-      }
-      drawPile(); tick();
-    }
-
-    // Bersih saat unload
-    window.addEventListener("beforeunload", () => {
-      if (ticker) clearInterval(ticker);
-      try { bgAudio && bgAudio.pause(); } catch(e){}
-    });
-  </script>
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+</script>
 </body>
 </html>
